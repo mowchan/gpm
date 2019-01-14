@@ -4,6 +4,7 @@ class Player:
     def __init__(self):
         self.instance = vlc.Instance('--verbose=-1')
         self.player = self.instance.media_player_new()
+        self.playback_timer = None
         self.reset()
 
     def set_album(self, album):

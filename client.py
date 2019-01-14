@@ -120,9 +120,10 @@ class Client:
         self.scr.move(self.prompt_y + 1, self.prompt_x)
 
     def handle_input(self, key):
+        # self.player is loaded with URL; playing or paused
         if not self.player is None and self.player.is_loaded: # player is loaded with url, playing or paused
             if key == curses.KEY_DOWN:
-                self.player.pause()
+                self.pause_song()
             elif key == curses.KEY_RIGHT:
                 self.play_next_song()
             elif key == curses.KEY_LEFT:
@@ -131,10 +132,13 @@ class Client:
                 self.clear_playback_timer()
                 self.clear_now_playing()
                 self.player.reset()
-        elif key == 27:
+        # no playback keys pressed; continue normal input handling
+        if key == 27:
             self.is_running = False
-        if key == 127: # backspace
-            if (self.input_index < 2): # if the query is about to be cleared
+        # backspace, mac "delete" key
+        if key == curses.KEY_BACKSPACE or key == 127:
+            # the query is about to be cleared
+            if self.input_index < 2:
                 self.handle_input_clear()
             else:
                 self.handle_input_backspace()
@@ -188,7 +192,8 @@ class Client:
         try:
             song = self.player.album[str(self.player.track_number)]
             song_duration = int(song['durationMillis']) / 1000
-            self.player.load_url(self.music.get_song_stream_url(song['id']))
+            song_url = self.music.get_song_stream_url(song['id'])
+            self.player.load_url(song_url)
             self.player.play()
             self.player.playback_timer = Timer(song_duration, self.play_next_song)
             self.player.playback_timer.start()
@@ -207,6 +212,15 @@ class Client:
             self.clear_playback_timer()
             self.player.decrement_track_number()
             self.play_song()
+
+    def pause_song(self):
+        # TODO: pause thread when player is paused...
+        # if not self.player.playback_timer is None:
+        #     if self.player.is_playing:
+        #         self.player.playback_timer.pause()
+        #     else:
+        #         self.player.playback_timer.start()
+        self.player.pause()
 
     def clear_playback_timer(self):
         if self.player.playback_timer.is_alive():
