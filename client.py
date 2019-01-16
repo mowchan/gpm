@@ -177,7 +177,9 @@ class Client:
             self.albums = self.selected_artist['albums']
             self.scr_list.clear()
             for index, album in enumerate(self.albums):
-                self.scr_list.addstr(index, 0, album['name'], curses.color_pair(2))
+                # TODO: scrolling
+                if (index < self.max_y - 8):
+                    self.scr_list.addstr(index, 0, album['name'], curses.color_pair(2))
             self.scr.move(4, 2)
             self.list_cur_y = 0
             self.scr_list.refresh()
